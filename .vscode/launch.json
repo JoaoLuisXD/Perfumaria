@@ -1,0 +1,73 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "src.application.Main",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "MainHeranca",
+      "request": "launch",
+      "mainClass": "revisãoProva.MainHeranca",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "RevisaoInterfacedois",
+      "request": "launch",
+      "mainClass": "revisãoProva.RevisaoInterfacedois",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "RevisaoInterface",
+      "request": "launch",
+      "mainClass": "revisãoProva.RevisaoInterface",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "ProdutoArray",
+      "request": "launch",
+      "mainClass": "revisãoProva.ProdutoArray",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "RevisaoArray",
+      "request": "launch",
+      "mainClass": "revisãoProva.RevisaoArray",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "type": "java",
+      "name": "Main",
+      "request": "launch",
+      "mainClass": "revisaoException.Main",
+      "projectName": "ProjetoJDBC_aca8a39c"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": ".",
+      "program": "build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
