@@ -3,13 +3,14 @@ package src.model.entities;
 public class Perfume {
     private Integer id;
     private String nome;
-    private String marca;
     private double preco;
     private Integer estoque;
 
+    private Marca marca;
+
     public Perfume() {}
 
-    public Perfume(Integer id, String nome, String marca, double preco, Integer estoque){
+    public Perfume(Integer id, String nome, Marca marca, double preco, Integer estoque){
         this.id = id;
         this.nome = nome;
         this.marca = marca;
@@ -29,10 +30,10 @@ public class Perfume {
     public void setNome(String nome) {
         this.nome = nome;
     }
-    public String getMarca() {
+    public Marca getMarca() {
         return marca;
     }
-    public void setMarca(String marca) {
+    public void setMarca(Marca marca) {
         this.marca = marca;
     }
     public double getPreco() {
