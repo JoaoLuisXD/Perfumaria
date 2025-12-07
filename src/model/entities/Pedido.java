@@ -5,15 +5,17 @@ public class Pedido {
     private double valor;
     private double comissao;
 
-    private Cliente cliente;
-    private Revendedor revendedor;
+    private String cpfCliente;
+    private String cpfRevendedor;
+  
 
-    public Pedido(int id, double valor, Cliente cliente, Revendedor revendedor){
+    public Pedido(int id, double valor, String cpfCliente, String cpfRevendedor){
         this.id = id;
         this.valor = valor;
         comissao = valor *0.5;
-        this.cliente = cliente;
-        this.revendedor = revendedor;
+        this.cpfCliente = cpfCliente;
+        this.cpfRevendedor = cpfRevendedor;
+        
     };
 
     public Pedido(){};
@@ -32,18 +34,18 @@ public class Pedido {
         this.valor = valor;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public String getCliente() {
+        return cpfCliente;
     }
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setCliente(String cpfCliente) {
+        this.cpfCliente = cpfCliente;
     }
 
-    public Revendedor getRevendedor() {
-        return revendedor;
+    public String getRevendedor() {
+        return cpfRevendedor;
     }
-    public void setRevendedor(Revendedor revendedor) {
-        this.revendedor = revendedor;
+    public void setRevendedor(String revendedor) {
+        this.cpfRevendedor = cpfRevendedor;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class Pedido {
         return "Pedido[ Id: "+ id
         + " Valor: R$ "+ valor
         + " Comissão: R$ "+ comissao
-        + " Cliente: "+ cliente
-        + " Revendedor:  "+ revendedor;
+        + " Cliente: "+ cpfCliente
+        + " Revendedor:  "+ cpfRevendedor;
     }
 }

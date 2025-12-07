@@ -18,8 +18,11 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
 
     @Override
     public void insert(Perfume obj) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
         try {
-            PreparedStatement st = conn.prepareStatement(
+            st = conn.prepareStatement(
                 "INSERT INTO perfume (nome, marca, preco, estoque) VALUES (?, ?, ?, ?)",
                 Statement.RETURN_GENERATED_KEYS
             );
@@ -32,25 +35,26 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
             int rows = st.executeUpdate();
 
             if (rows > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+                rs = st.getGeneratedKeys();
                 if (rs.next()) {
-                    int id = rs.getInt(1);
-                    obj.setId(id);
+                    obj.setId(rs.getInt(1));
                 }
-                DB.closeResultSet(rs);
             }
-
-            DB.closeStatement(st);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(st);
         }
     }
 
     @Override
     public void update(Perfume obj) {
+        PreparedStatement st = null;
+
         try {
-            PreparedStatement st = conn.prepareStatement(
+            st = conn.prepareStatement(
                 "UPDATE perfume SET nome=?, marca=?, preco=?, estoque=? WHERE id=?"
             );
 
@@ -61,73 +65,82 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
             st.setInt(5, obj.getId());
 
             st.executeUpdate();
-            DB.closeStatement(st);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DB.closeStatement(st);
         }
     }
 
     @Override
     public void deleteById(Integer id) {
+        PreparedStatement st = null;
+
         try {
-            PreparedStatement st = conn.prepareStatement(
+            st = conn.prepareStatement(
                 "DELETE FROM perfume WHERE id=?"
             );
 
             st.setInt(1, id);
             st.executeUpdate();
-            DB.closeStatement(st);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DB.closeStatement(st);
         }
     }
 
     @Override
     public Perfume findById(Integer id) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+
         try {
-            PreparedStatement st = conn.prepareStatement(
+            st = conn.prepareStatement(
                 "SELECT * FROM perfume WHERE id=?"
             );
-            st.setInt(1, id);
 
-            ResultSet rs = st.executeQuery();
-            Perfume obj = null;
+            st.setInt(1, id);
+            rs = st.executeQuery();
 
             if (rs.next()) {
-                obj = instantiatePerfume(rs);
+                return instantiatePerfume(rs);
             }
 
-            DB.closeResultSet(rs);
-            DB.closeStatement(st);
-            return obj;
+            return null;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(st);
         }
     }
 
     @Override
     public List<Perfume> findAll() {
-        try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM perfume"
-            );
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-            ResultSet rs = st.executeQuery();
+        try {
+            st = conn.prepareStatement("SELECT * FROM perfume");
+            rs = st.executeQuery();
+
             List<Perfume> list = new ArrayList<>();
 
             while (rs.next()) {
                 list.add(instantiatePerfume(rs));
             }
 
-            DB.closeResultSet(rs);
-            DB.closeStatement(st);
             return list;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(st);
         }
     }
 

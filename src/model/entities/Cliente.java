@@ -47,13 +47,20 @@ public class Cliente {
         this.endereco = endereco;
     }
 
+    public String getTelefone() {
+        return telefone;
+    }
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
     @Override
     public String toString() {
         return "Cliente[ CPF: " + cpf
         + " Nome: "+ nome
         + " E-mail:  "+ email
         + " Endereço:  "+ endereco
-        + "Telefone: "
+        + "Telefone: " + telefone
         +" ]";
     }
 }

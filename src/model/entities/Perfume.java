@@ -6,16 +6,17 @@ public class Perfume {
     private double preco;
     private Integer estoque;
 
-    private Marca marca;
+    private String marca;
 
     public Perfume() {}
 
-    public Perfume(Integer id, String nome, Marca marca, double preco, Integer estoque){
+    public Perfume(Integer id, String nome, String marca, double preco, Integer estoque){
         this.id = id;
         this.nome = nome;
         this.marca = marca;
         this.preco = preco;
         this.estoque = estoque;
+        
     }
 
     public Integer getId() {
@@ -30,10 +31,10 @@ public class Perfume {
     public void setNome(String nome) {
         this.nome = nome;
     }
-    public Marca getMarca() {
+    public String getMarca() {
         return marca;
     }
-    public void setMarca(Marca marca) {
+    public void setMarca(String marca) {
         this.marca = marca;
     }
     public double getPreco() {

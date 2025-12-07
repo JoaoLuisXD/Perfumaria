@@ -5,12 +5,15 @@ public class Revendedor {
     private String nome;
     private String email;
     private Float salario;
+    private String telefone;
 
-    public Revendedor(String cpf, String nome,String email, Float salario){
+
+    public Revendedor(String cpf, String nome,String email, Float salario,String telefone){
         this.cpf = cpf;
         this.nome = nome;
         this.email = email;
         this.salario = salario;
+        this.telefone = telefone;
     };
 
     public Revendedor(){};
@@ -41,6 +44,23 @@ public class Revendedor {
     }
     public void setSalario(Float salario) {
         this.salario = salario;
+    }
+    
+    public String getTelefone() {
+        return telefone;
+    }
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    @Override
+    public String toString() {
+        return "Revendedor[ CPF: " + cpf
+        + " Nome: "+ nome
+        + " E-mail:  "+ email
+        + " Salário:  "+ salario
+        + " Telefone: " + telefone
+        +" ]";
     }
 
 }
