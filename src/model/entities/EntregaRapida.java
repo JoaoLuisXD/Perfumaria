@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class EntregaRapida extends Entrega {
 
-    public EntregaRapida(Integer id, String endereco, double valorEntrega, Date data, String status) {
-        super(id, endereco, valorEntrega, data, status);
+    public EntregaRapida(Integer id, String endereco, double valorEntrega, Date data, String status, Integer idPedido) {
+        super(id, endereco, valorEntrega, data, status, idPedido);
     }
 
     @Override

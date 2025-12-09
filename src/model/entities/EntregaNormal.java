@@ -6,8 +6,8 @@ public class EntregaNormal extends Entrega {
 
     public EntregaNormal() { super(); }
 
-    public EntregaNormal(Integer id, String endereco, double valorEntrega, Date data, String status) {
-        super(id, endereco, valorEntrega, data, status);
+    public EntregaNormal(Integer id, String endereco, double valorEntrega, Date data, String status, Integer idPedido) {
+        super(id, endereco, valorEntrega, data, status, idPedido);
     }
 
     @Override

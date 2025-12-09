@@ -8,15 +8,18 @@ public abstract class Entrega {
     private double valorEntrega;
     private Date data;
     private String status; // ex: "PENDENTE", "EM_TRANSITO", "ENTREGUE"
+    private Integer idPedido;
+
 
     public Entrega() {}
 
-    public Entrega(Integer id, String endereco, double valorEntrega, Date data, String status) {
+    public Entrega(Integer id, String endereco, double valorEntrega, Date data, String status, Integer idPedido) {
         this.id = id;
         this.endereco = endereco;
         this.valorEntrega = valorEntrega;
         this.data = data;
         this.status = status;
+        this.idPedido = idPedido;
     }
 
     public Integer getId() { return id; }
@@ -33,6 +36,9 @@ public abstract class Entrega {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getIdPedido() { return idPedido; }
+    public void setIdPedido(Integer idPedido) { this.idPedido = idPedido; }
 
     // mantém o método abstrato que impõe polimorfismo nas subclasses
     public abstract double calcularValorFinal();

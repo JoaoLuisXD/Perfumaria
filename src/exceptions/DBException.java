@@ -1,4 +1,4 @@
-package src.model.exceptions;
+package src.exceptions;
 
 public class DBException extends Exception{
     public DBException(String msg){

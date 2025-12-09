@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBIntegrityException;
 import src.model.dao.ClienteDAO;
 import src.model.entities.Cliente;
 
@@ -59,27 +60,23 @@ public class ClienteDAOJDBC implements ClienteDAO {
     }
 
     @Override
-    public void deleteByCpf(String cpf) {
+    public void deleteByCpf(String cpf) throws DBIntegrityException{
         try {
-            PreparedStatement st = conn.prepareStatement(
-                "DELETE FROM cliente WHERE cpf=?"
-            );
+            PreparedStatement st = conn.prepareStatement("DELETE FROM cliente WHERE cpf=?");
 
             st.setString(1, cpf);
             st.executeUpdate();
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 
     @Override
     public Cliente findByCpf(String cpf) {
         try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM cliente WHERE cpf=?"
-            );
+            PreparedStatement st = conn.prepareStatement("SELECT * FROM cliente WHERE cpf=?");
             st.setString(1, cpf);
 
             ResultSet rs = st.executeQuery();

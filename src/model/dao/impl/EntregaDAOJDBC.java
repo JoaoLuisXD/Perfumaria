@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
-import src.model.exceptions.DBException;
+import src.exceptions.DBException;
 import src.model.dao.EntregaDAO;
 import src.model.entities.Entrega;
 import src.model.entities.EntregaNormal;
+import src.model.entities.EntregaRapida;
 
 public class EntregaDAOJDBC implements EntregaDAO {
 
@@ -19,32 +20,38 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public void insert(Entrega obj) throws DBException  {
-        try {
-            PreparedStatement st = conn.prepareStatement(
-                "INSERT INTO entrega (endereco, valor_entrega, data, status) VALUES (?, ?, ?, ?)",
-                Statement.RETURN_GENERATED_KEYS
-            );
+    public void insert(Entrega obj) throws DBException{
+    PreparedStatement st = null;
 
-            st.setString(1, obj.getEndereco());
-            st.setDouble(2, obj.getValorEntrega());
-            st.setDate(3, new java.sql.Date(obj.getData().getTime()));
-            st.setString(4, obj.getStatus());
+    try {
+        st = conn.prepareStatement(
+            "INSERT INTO entrega (endereco, valor_entrega, data, status, idPedido, tipo) " +
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            Statement.RETURN_GENERATED_KEYS
+        );
 
-            st.executeUpdate();
+        st.setString(1, obj.getEndereco());
+        st.setDouble(2, obj.getValorEntrega());
+        st.setDate(3, new java.sql.Date(obj.getData().getTime()));
+        st.setString(4, obj.getStatus());
+        st.setInt(5, obj.getIdPedido());
+        st.setString(6, (obj instanceof EntregaRapida) ? "RAPIDA" : "NORMAL");
 
-            ResultSet rs = st.getGeneratedKeys();
-            if (rs.next()) {
-                obj.setId(rs.getInt(1));
-            }
+        st.executeUpdate();
 
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
-
-        } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+        ResultSet rs = st.getGeneratedKeys();
+        if (rs.next()) {
+            obj.setId(rs.getInt(1));
         }
+
+        DB.closeStatement(st);
+        DB.closeResultSet(rs);
+
+    } catch (SQLException e) {
+        throw new DBException(e.getMessage());
     }
+}
+
 
     @Override
     public void update(Entrega obj) throws DBException {
@@ -109,6 +116,34 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
+public Entrega findByPedidoId(int pedidoId) throws DBException{
+    PreparedStatement st = null;
+    ResultSet rs = null;
+
+    try {
+        st = conn.prepareStatement(
+            "SELECT * FROM entrega WHERE idPedido = ?"
+        );
+
+        st.setInt(1, pedidoId);
+        rs = st.executeQuery();
+
+        if (rs.next()) {
+            return instantiateEntrega(rs);
+        }
+
+        return null;
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar entrega por pedido: " + e.getMessage());
+    } finally {
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+    }
+}
+
+
+    @Override
     public List<Entrega> findAll() throws DBException {
         try {
             PreparedStatement st = conn.prepareStatement(
@@ -134,19 +169,30 @@ public class EntregaDAOJDBC implements EntregaDAO {
 
     private Entrega instantiateEntrega(ResultSet rs) throws SQLException {
 
-        // Aqui você **não pode criar new Entrega()** porque é abstrata.
-        // Então precisamos decidir qual tipo usar.
+    String tipo = rs.getString("tipo");
+    Entrega obj;
 
-        // Exemplo: criando sempre EntregaNormal (mínimo para funcionar).
-        // Você pode depois melhorar isso com tipo no banco (tipo_entrega).
-        Entrega obj = new EntregaNormal(
+    if (tipo.equalsIgnoreCase("RAPIDA")) {
+        obj = new EntregaRapida(
             rs.getInt("id"),
             rs.getString("endereco"),
             rs.getDouble("valor_entrega"),
             rs.getDate("data"),
-            rs.getString("status")
+            rs.getString("status"),
+            rs.getInt("idPedido")
         );
-
-        return obj;
+    } else {
+        obj = new EntregaNormal(
+            rs.getInt("id"),
+            rs.getString("endereco"),
+            rs.getDouble("valor_entrega"),
+            rs.getDate("data"),
+            rs.getString("status"),
+            rs.getInt("idPedido")
+        );
     }
+
+    return obj;
+}
+
 }

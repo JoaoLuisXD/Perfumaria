@@ -2,6 +2,7 @@ package src.model.dao;
 
 import src.db.DB;
 import src.model.dao.impl.ClienteDAOJDBC;
+import src.model.dao.impl.EntregaDAOJDBC;
 import src.model.dao.impl.MarcaDAOJDBC;
 import src.model.dao.impl.PedidoDAOJDBC;
 import src.model.dao.impl.PerfumeDAOJDBC;
@@ -33,4 +34,9 @@ public class DAOFactory {
     public static IncluiDAO cIncluiDAO() {
         return new IncluiDAOJDBC(DB.getConn());
     }
+
+    public static EntregaDAO createEntregaDAO() {
+    return new EntregaDAOJDBC(DB.getConn());
+    }
+
 }
