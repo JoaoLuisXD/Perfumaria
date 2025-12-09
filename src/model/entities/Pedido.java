@@ -44,7 +44,7 @@ public class Pedido {
     public String getRevendedor() {
         return cpfRevendedor;
     }
-    public void setRevendedor(String revendedor) {
+    public void setRevendedor(String cpfRevendedor) {
         this.cpfRevendedor = cpfRevendedor;
     }
 

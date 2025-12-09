@@ -1,12 +1,12 @@
 package src.model.dao;
 
-import src.model.entities.Inclui;
 import java.util.List;
+import src.model.entities.Inclui;
 
 public interface IncluiDAO {
     void insert(Inclui obj);
     void update(Inclui obj);
-    void deleteById(Integer id);
-    Inclui findById(Integer id);
+    void delete(int idPedido, int idPerfume);
+    Inclui findById(int idPedido, int idPerfume);
     List<Inclui> findAll();
 }
