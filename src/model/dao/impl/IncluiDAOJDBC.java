@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBIntegrityException;
 import src.model.dao.IncluiDAO;
 import src.model.entities.Inclui;
 
@@ -57,7 +58,7 @@ public class IncluiDAOJDBC implements IncluiDAO {
     }
 
     @Override
-    public void delete(int idPedido, int idPerfume) {
+    public void delete(int idPedido, int idPerfume) throws DBIntegrityException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM inclui WHERE id_pedido=? AND id_perfume=?"
@@ -70,7 +71,7 @@ public class IncluiDAOJDBC implements IncluiDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 

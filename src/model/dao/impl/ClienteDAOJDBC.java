@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBException;
 import src.exceptions.DBIntegrityException;
+import src.exceptions.EntidadeJaExisteException;
 import src.model.dao.ClienteDAO;
 import src.model.entities.Cliente;
 
@@ -18,7 +20,7 @@ public class ClienteDAOJDBC implements ClienteDAO {
     }
 
     @Override
-    public void insert(Cliente obj) {
+    public void insert(Cliente obj) throws DBException, EntidadeJaExisteException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "INSERT INTO cliente (cpf, nome, email, endereco, telefone) VALUES (?, ?, ?, ?, ?)"
@@ -34,8 +36,11 @@ public class ClienteDAOJDBC implements ClienteDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+            if (e.getErrorCode() == 1062) {
+                throw new EntidadeJaExisteException("CPF já cadastrado.");
+            }
+            throw new DBException(e.getMessage());   
+        } 
     }
 
     @Override

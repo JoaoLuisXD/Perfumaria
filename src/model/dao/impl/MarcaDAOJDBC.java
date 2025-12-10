@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBException;
+import src.exceptions.DBIntegrityException;
+import src.exceptions.EntidadeJaExisteException;
 import src.model.dao.MarcaDAO;
 import src.model.entities.Marca;
 
@@ -17,7 +20,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
     }
 
     @Override
-    public void insert(Marca obj) {
+    public void insert(Marca obj) throws EntidadeJaExisteException, DBException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "INSERT INTO marca (cnpj, nome, origem, ano_criacao) VALUES (?, ?, ?, ?)"
@@ -31,7 +34,10 @@ public class MarcaDAOJDBC implements MarcaDAO {
             st.executeUpdate();
             DB.closeStatement(st);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (e.getErrorCode() == 1062) {
+                throw new EntidadeJaExisteException("CNPJ já cadastrado.");
+            }
+            throw new DBException(e.getMessage()); 
         }
     }
 
@@ -55,7 +61,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
     }
 
     @Override
-    public void deleteByCnpj(String cnpj) {
+    public void deleteByCnpj(String cnpj) throws DBIntegrityException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM marca WHERE cnpj=?"
@@ -66,7 +72,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 

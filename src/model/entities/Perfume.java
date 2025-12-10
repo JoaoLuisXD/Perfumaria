@@ -1,19 +1,21 @@
 package src.model.entities;
 
+import src.exceptions.CampoObrigatorioException;
+
 public class Perfume {
     private Integer id;
     private String nome;
     private double preco;
     private Integer estoque;
 
-    private String marca;
+    private String cnpj_marca;
 
     public Perfume() {}
 
-    public Perfume(Integer id, String nome, String marca, double preco, Integer estoque){
+    public Perfume(Integer id, String nome, String cnpj_marca, double preco, Integer estoque){
         this.id = id;
         this.nome = nome;
-        this.marca = marca;
+        this.cnpj_marca = cnpj_marca;
         this.preco = preco;
         this.estoque = estoque;
         
@@ -22,7 +24,12 @@ public class Perfume {
     public Integer getId() {
         return id;
     }
-    public void setId(Integer id) {
+    public void setId(Integer id) throws CampoObrigatorioException{
+
+        if (id == null) {
+            throw new CampoObrigatorioException("ID é obrigatório");
+        }
+
         this.id = id;
     }
     public String getNome() {
@@ -32,10 +39,13 @@ public class Perfume {
         this.nome = nome;
     }
     public String getMarca() {
-        return marca;
+        return cnpj_marca;
     }
-    public void setMarca(String marca) {
-        this.marca = marca;
+    public void setMarca(String marca) throws CampoObrigatorioException {
+        if (id == null) {
+            throw new CampoObrigatorioException("Marca é obrigatória");
+        }
+        this.cnpj_marca = cnpj_marca;
     }
     public double getPreco() {
         return preco;
@@ -51,7 +61,7 @@ public class Perfume {
     }
 
     public String toString(){
-        return "Perfume [id: " + id + ", nome: " + nome + ", marca: " + marca + ", preco: " + preco + ", estoque: " + estoque + "]";
+        return "Perfume [id: " + id + ", nome: " + nome + ", marca: " + cnpj_marca + ", preco: " + preco + ", estoque: " + estoque + "]";
     }
 }
 

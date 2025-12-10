@@ -1,7 +1,9 @@
 package src.model.entities;
 
+import src.exceptions.CampoObrigatorioException;
+
 public class Pedido {
-    private int id;
+    private Integer id;
     private double valor;
     private double comissao;
 
@@ -9,7 +11,7 @@ public class Pedido {
     private String cpfRevendedor;
   
 
-    public Pedido(int id, double valor, String cpfCliente, String cpfRevendedor){
+    public Pedido(Integer id, double valor, String cpfCliente, String cpfRevendedor){
         this.id = id;
         this.valor = valor;
         comissao = valor *0.5;
@@ -23,7 +25,12 @@ public class Pedido {
     public int getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Integer id) throws CampoObrigatorioException{
+
+        if (id == null) {
+            throw new CampoObrigatorioException("ID é obrigatório");
+        }
+
         this.id = id;
     }
 

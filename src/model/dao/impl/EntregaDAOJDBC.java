@@ -6,6 +6,7 @@ import java.util.List;
 
 import src.db.DB;
 import src.exceptions.DBException;
+import src.exceptions.DBIntegrityException;
 import src.model.dao.EntregaDAO;
 import src.model.entities.Entrega;
 import src.model.entities.EntregaNormal;
@@ -75,7 +76,7 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public void deleteById(Integer id) throws DBException {
+    public void deleteById(Integer id) throws DBIntegrityException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM entrega WHERE id=?"
@@ -87,7 +88,7 @@ public class EntregaDAOJDBC implements EntregaDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 

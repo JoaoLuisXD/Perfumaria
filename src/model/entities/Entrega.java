@@ -2,6 +2,8 @@ package src.model.entities;
 
 import java.util.Date;
 
+import src.exceptions.CampoObrigatorioException;
+
 public abstract class Entrega {
     private Integer id;
     private String endereco;
@@ -23,10 +25,21 @@ public abstract class Entrega {
     }
 
     public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public void setId(Integer id) throws CampoObrigatorioException {
+        if (id == null) {
+            throw new CampoObrigatorioException("ID é obrigatório");
+        }
+        this.id = id; 
+    }
 
     public String getEndereco() { return endereco; }
-    public void setEndereco(String endereco) { this.endereco = endereco; }
+    public void setEndereco(String endereco) throws CampoObrigatorioException{
+
+        if (endereco == null || endereco.trim().isEmpty()) {
+            throw new CampoObrigatorioException("Endereco é obrigatório");
+        }
+        this.endereco = endereco; 
+    }
 
     public double getValorEntrega() { return valorEntrega; }
     public void setValorEntrega(double valorEntrega) { this.valorEntrega = valorEntrega; }

@@ -1,5 +1,7 @@
 package src.model.entities;
 
+import src.exceptions.CampoObrigatorioException;
+
 public class Marca {
     private String cnpj;
     private String nome;
@@ -20,14 +22,23 @@ public class Marca {
     public String getCnpj() {
         return cnpj;
     }
-    public void setCnpj(String cnpj) {
+    public void setCnpj(String cnpj) throws CampoObrigatorioException{
+
+        if (cnpj == null || cnpj.trim().isEmpty()) {
+            throw new CampoObrigatorioException("CNPJ é obrigatório");
+        }
         this.cnpj = cnpj;
     }
 
     public String getNome() {
         return nome;
     }
-    public void setNome(String nome) {
+    public void setNome(String nome) throws CampoObrigatorioException{
+
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new CampoObrigatorioException("Nome é obrigatório");
+        }
+
         this.nome = nome;
     }
 

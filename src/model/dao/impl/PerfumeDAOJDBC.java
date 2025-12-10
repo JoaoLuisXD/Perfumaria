@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBIntegrityException;
 import src.model.dao.PerfumeDAO;
 import src.model.entities.Perfume;
 
@@ -74,7 +75,7 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws DBIntegrityException{
         PreparedStatement st = null;
 
         try {
@@ -86,7 +87,7 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
             st.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         } finally {
             DB.closeStatement(st);
         }

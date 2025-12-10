@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBException;
+import src.exceptions.DBIntegrityException;
+import src.exceptions.EntidadeJaExisteException;
 import src.model.dao.RevendedorDAO;
 import src.model.entities.Revendedor;
 
@@ -17,7 +20,7 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
     }
 
     @Override
-    public void insert(Revendedor obj) {
+    public void insert(Revendedor obj) throws EntidadeJaExisteException, DBException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "INSERT INTO revendedor (cpf, nome, email, salario, telefone) VALUES (?, ?, ?, ?, ?)"
@@ -33,9 +36,13 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (e.getErrorCode() == 1062) {
+            throw new EntidadeJaExisteException("CPF de revendedor já cadastrado.");
+            }
+            throw new DBException("Erro ao inserir revendedor: " + e.getMessage());
         }
     }
+
 
     @Override
     public void update(Revendedor obj) {
@@ -59,7 +66,7 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
     }
 
     @Override
-    public void deleteByCpf(String cpf) {
+    public void deleteByCpf(String cpf) throws DBIntegrityException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM revendedor WHERE cpf=?"
@@ -70,7 +77,7 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
             DB.closeStatement(st);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 

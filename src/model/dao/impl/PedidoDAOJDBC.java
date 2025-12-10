@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.DBIntegrityException;
 import src.model.dao.PedidoDAO;
 import src.model.entities.Pedido;
 
@@ -68,7 +69,7 @@ public class PedidoDAOJDBC implements PedidoDAO {
     }
 
     @Override
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws DBIntegrityException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM pedido WHERE id=?"
@@ -79,7 +80,7 @@ public class PedidoDAOJDBC implements PedidoDAO {
 
             DB.closeStatement(st);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DBIntegrityException("Erro ao deletar");
         }
     }
 
