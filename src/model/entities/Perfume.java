@@ -45,7 +45,7 @@ public class Perfume {
         if (id == null) {
             throw new CampoObrigatorioException("Marca é obrigatória");
         }
-        this.cnpj_marca = cnpj_marca;
+        this.cnpj_marca = marca;
     }
     public double getPreco() {
         return preco;
