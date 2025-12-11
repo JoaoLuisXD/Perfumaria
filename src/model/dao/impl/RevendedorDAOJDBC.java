@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.CampoObrigatorioException;
 import src.exceptions.DBException;
 import src.exceptions.DBIntegrityException;
 import src.exceptions.EntidadeJaExisteException;
+import src.exceptions.EntidadeNaoEncontradaException;
 import src.model.dao.RevendedorDAO;
 import src.model.entities.Revendedor;
 
@@ -81,32 +83,39 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
         }
     }
 
-    @Override
-    public Revendedor findByCpf(String cpf) {
-        try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM revendedor WHERE cpf=?"
-            );
-            st.setString(1, cpf);
+   @Override
+    public Revendedor findByCpf(String cpf) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
 
-            ResultSet rs = st.executeQuery();
-            Revendedor obj = null;
+    try {
+        PreparedStatement st = conn.prepareStatement(
+            "SELECT * FROM revendedor WHERE cpf=?"
+        );
+        st.setString(1, cpf);
 
-            if (rs.next()) {
-                obj = instantiateRevendedor(rs);
-            }
+        ResultSet rs = st.executeQuery();
 
+        if (!rs.next()) {
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            return obj;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new EntidadeNaoEncontradaException(
+                "Revendedor com CPF " + cpf + " não encontrado."
+            );
         }
+
+        Revendedor obj = instantiateRevendedor(rs);
+
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+        return obj;
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar revendedor");
     }
+}
+
 
     @Override
-    public List<Revendedor> findAll() {
+    public List<Revendedor> findAll() throws CampoObrigatorioException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "SELECT * FROM revendedor"
@@ -128,7 +137,7 @@ public class RevendedorDAOJDBC implements RevendedorDAO {
         }
     }
 
-    private Revendedor instantiateRevendedor(ResultSet rs) throws SQLException {
+    private Revendedor instantiateRevendedor(ResultSet rs) throws SQLException, CampoObrigatorioException {
         Revendedor obj = new Revendedor();
         obj.setCpf(rs.getString("cpf"));
         obj.setNome(rs.getString("nome"));

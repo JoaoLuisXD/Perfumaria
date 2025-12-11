@@ -8,6 +8,8 @@ import src.db.DB;
 import src.exceptions.DBException;
 import src.exceptions.DBIntegrityException;
 import src.exceptions.EntidadeJaExisteException;
+import src.exceptions.CampoObrigatorioException;
+import src.exceptions.EntidadeNaoEncontradaException;
 import src.model.dao.ClienteDAO;
 import src.model.entities.Cliente;
 
@@ -79,29 +81,33 @@ public class ClienteDAOJDBC implements ClienteDAO {
     }
 
     @Override
-    public Cliente findByCpf(String cpf) {
-        try {
-            PreparedStatement st = conn.prepareStatement("SELECT * FROM cliente WHERE cpf=?");
-            st.setString(1, cpf);
+    public Cliente findByCpf(String cpf) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
+    try {
+        PreparedStatement st = conn.prepareStatement("SELECT * FROM cliente WHERE cpf=?");
+        st.setString(1, cpf);
 
-            ResultSet rs = st.executeQuery();
-            Cliente obj = null;
+        ResultSet rs = st.executeQuery();
 
-            if (rs.next()) {
-                obj = instantiateCliente(rs);
-            }
-
+        if (!rs.next()) {
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            return obj;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new EntidadeNaoEncontradaException("Cliente com CPF " + cpf + " não encontrado.");
         }
+
+        Cliente obj = instantiateCliente(rs);
+
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+        return obj;
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar cliente");
     }
+}
+
 
     @Override
-    public List<Cliente> findAll() {
+    public List<Cliente> findAll() throws CampoObrigatorioException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "SELECT * FROM cliente"
@@ -123,7 +129,7 @@ public class ClienteDAOJDBC implements ClienteDAO {
         }
     }
 
-    private Cliente instantiateCliente(ResultSet rs) throws SQLException {
+    private Cliente instantiateCliente(ResultSet rs) throws SQLException, CampoObrigatorioException {
         Cliente obj = new Cliente();
         obj.setCpf(rs.getString("cpf"));
         obj.setNome(rs.getString("nome"));

@@ -1,6 +1,7 @@
 package src.model.entities;
 
 import src.exceptions.CampoObrigatorioException;
+import src.exceptions.FormatoInvalidoException;
 
 public class Revendedor {
     private String cpf;
@@ -28,7 +29,9 @@ public class Revendedor {
         if (cpf == null) {
             throw new CampoObrigatorioException("CPF é obrigatório");
         }
-
+        if (!cpf.matches("\\d{11}")) {
+        throw new FormatoInvalidoException("CPF deve ter 11 dígitos numéricos");
+    }
         this.cpf = cpf;
     }
 
@@ -48,6 +51,9 @@ public class Revendedor {
         return email;
     }
     public void setEmail(String email) {
+        if (!email.contains("@") || !email.contains(".")) {
+            throw new FormatoInvalidoException("Formato de e-mail inválido");
+    }
         this.email = email;
     }
 
@@ -55,6 +61,9 @@ public class Revendedor {
         return salario;
     }
     public void setSalario(Float salario) {
+        if (salario != null && salario < 0) {
+        throw new FormatoInvalidoException("Salário não pode ser negativo");
+    }
         this.salario = salario;
     }
     
@@ -62,6 +71,9 @@ public class Revendedor {
         return telefone;
     }
     public void setTelefone(String telefone) {
+         if (telefone != null && !telefone.matches("\\d{9,11}")) {
+            throw new FormatoInvalidoException("Telefone deve conter entre 9 e 11 dígitos numéricos");
+    }
         this.telefone = telefone;
     }
 

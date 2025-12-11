@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.CampoObrigatorioException;
+import src.exceptions.*;
 import src.exceptions.DBIntegrityException;
 import src.model.dao.PerfumeDAO;
 import src.model.entities.Perfume;
@@ -18,7 +20,7 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
     }
 
     @Override
-    public void insert(Perfume obj) {
+    public void insert(Perfume obj) throws CampoObrigatorioException {
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -94,34 +96,38 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
     }
 
     @Override
-    public Perfume findById(Integer id) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
+    public Perfume findById(Integer id) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
+    PreparedStatement st = null;
+    ResultSet rs = null;
 
-        try {
-            st = conn.prepareStatement(
-                "SELECT * FROM perfume WHERE id=?"
+    try {
+        st = conn.prepareStatement(
+            "SELECT * FROM perfume WHERE id=?"
+        );
+
+        st.setInt(1, id);
+        rs = st.executeQuery();
+
+        if (!rs.next()) {
+            throw new EntidadeNaoEncontradaException(
+                "Perfume com ID " + id + " não encontrado."
             );
-
-            st.setInt(1, id);
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                return instantiatePerfume(rs);
-            }
-
-            return null;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            DB.closeResultSet(rs);
-            DB.closeStatement(st);
         }
+
+        return instantiatePerfume(rs);
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar perfume");
+    } finally {
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
     }
+}
+
+
 
     @Override
-    public List<Perfume> findAll() {
+    public List<Perfume> findAll() throws CampoObrigatorioException {
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -145,7 +151,7 @@ public class PerfumeDAOJDBC implements PerfumeDAO {
         }
     }
 
-    private Perfume instantiatePerfume(ResultSet rs) throws SQLException {
+    private Perfume instantiatePerfume(ResultSet rs) throws SQLException, CampoObrigatorioException {
         Perfume obj = new Perfume();
         obj.setId(rs.getInt("id"));
         obj.setNome(rs.getString("nome"));

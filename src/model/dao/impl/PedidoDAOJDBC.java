@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.CampoObrigatorioException;
 import src.exceptions.DBIntegrityException;
+import src.exceptions.DBException;
+import src.exceptions.EntidadeNaoEncontradaException;
 import src.model.dao.PedidoDAO;
 import src.model.entities.Pedido;
 
@@ -18,7 +21,7 @@ public class PedidoDAOJDBC implements PedidoDAO {
     }
 
     @Override
-    public void insert(Pedido obj) {
+    public void insert(Pedido obj) throws CampoObrigatorioException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "INSERT INTO pedido (valor, comissao, cpfCliente, cpfRevendedor) VALUES (?, ?, ?, ?)",
@@ -85,31 +88,37 @@ public class PedidoDAOJDBC implements PedidoDAO {
     }
 
     @Override
-    public Pedido findById(Integer id) {
-        try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM pedido WHERE id=?"
-            );
-            st.setInt(1, id);
+    public Pedido findById(Integer id) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
+    try {
+        PreparedStatement st = conn.prepareStatement(
+            "SELECT * FROM pedido WHERE id=?"
+        );
+        st.setInt(1, id);
 
-            ResultSet rs = st.executeQuery();
-            Pedido obj = null;
+        ResultSet rs = st.executeQuery();
 
-            if (rs.next()) {
-                obj = instantiatePedido(rs);
-            }
-
+        // Caso não encontre o pedido
+        if (!rs.next()) {
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            return obj;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new EntidadeNaoEncontradaException("Pedido com id " + id + " não encontrado.");
         }
+
+        // Encontrou → instanciando o Pedido
+        Pedido obj = instantiatePedido(rs);
+
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+        return obj;
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar pedido no banco de dados");
     }
+}
+
 
     @Override
-    public List<Pedido> findAll() {
+    public List<Pedido> findAll() throws CampoObrigatorioException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "SELECT * FROM pedido"
@@ -131,7 +140,7 @@ public class PedidoDAOJDBC implements PedidoDAO {
         }
     }
 
-    private Pedido instantiatePedido(ResultSet rs) throws SQLException {
+    private Pedido instantiatePedido(ResultSet rs) throws SQLException, CampoObrigatorioException {
         Pedido obj = new Pedido();
         obj.setId(rs.getInt("id"));
         obj.setValor(rs.getDouble("valor"));

@@ -7,6 +7,8 @@ import java.util.List;
 import src.db.DB;
 import src.exceptions.DBException;
 import src.exceptions.DBIntegrityException;
+import src.exceptions.CampoObrigatorioException;
+import src.exceptions.EntidadeNaoEncontradaException;
 import src.model.dao.EntregaDAO;
 import src.model.entities.Entrega;
 import src.model.entities.EntregaNormal;
@@ -21,7 +23,7 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public void insert(Entrega obj) throws DBException{
+    public void insert(Entrega obj) throws DBException, CampoObrigatorioException{
     PreparedStatement st = null;
 
     try {
@@ -93,26 +95,27 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public Entrega findById(Integer id) throws DBException {
+    public Entrega findById(Integer id) throws DBException, EntidadeNaoEncontradaException, CampoObrigatorioException {
         try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM entrega WHERE id=?"
-            );
-            st.setInt(1, id);
+        PreparedStatement st = conn.prepareStatement("SELECT * FROM entrega WHERE id_entrega = ?");
+        st.setInt(1, id);
 
-            ResultSet rs = st.executeQuery();
-            Entrega obj = null;
+        ResultSet rs = st.executeQuery();
 
-            if (rs.next()) {
-                obj = instantiateEntrega(rs);
-            }
-
-            DB.closeStatement(st);
+        if (!rs.next()) {
             DB.closeResultSet(rs);
-            return obj;
+            DB.closeStatement(st);
+            throw new EntidadeNaoEncontradaException("Entrega com id " + id + " não encontrado.");
+        }
+
+        Entrega obj = instantiateEntrega(rs);
+
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+        return obj;
 
         } catch (SQLException e) {
-            throw new DBException(e.getMessage());
+            throw new DBException("Erro ao buscar cliente");
         }
     }
 

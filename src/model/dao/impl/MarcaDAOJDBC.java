@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import src.db.DB;
+import src.exceptions.CampoObrigatorioException;
 import src.exceptions.DBException;
 import src.exceptions.DBIntegrityException;
 import src.exceptions.EntidadeJaExisteException;
+import src.exceptions.EntidadeNaoEncontradaException;
 import src.model.dao.MarcaDAO;
 import src.model.entities.Marca;
 
@@ -77,31 +79,37 @@ public class MarcaDAOJDBC implements MarcaDAO {
     }
 
     @Override
-    public Marca findByCnpj(String cnpj) {
-        try {
-            PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM marca WHERE cnpj=?"
-            );
-            st.setString(1, cnpj);
+    public Marca findByCnpj(String cnpj) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
+    try {
+        PreparedStatement st = conn.prepareStatement(
+            "SELECT * FROM marca WHERE cnpj = ?"
+        );
+        st.setString(1, cnpj);
 
-            ResultSet rs = st.executeQuery();
-            Marca obj = null;
+        ResultSet rs = st.executeQuery();
 
-            if (rs.next()) {
-                obj = instantiateMarca(rs);
-            }
-
+        // Se não encontrou nenhum registro no banco
+        if (!rs.next()) {
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            return obj;
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new EntidadeNaoEncontradaException("Marca com CNPJ " + cnpj + " não encontrada.");
         }
+
+        // Se encontrou, instancia normalmente
+        Marca obj = instantiateMarca(rs);
+
+        DB.closeResultSet(rs);
+        DB.closeStatement(st);
+        return obj;
+
+    } catch (SQLException e) {
+        throw new DBException("Erro ao buscar marca");
     }
+}
+
 
     @Override
-    public List<Marca> findAll() {
+    public List<Marca> findAll() throws CampoObrigatorioException{
         try {
             PreparedStatement st = conn.prepareStatement(
                 "SELECT * FROM marca"
@@ -123,7 +131,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
         }
     }
 
-    private Marca instantiateMarca(ResultSet rs) throws SQLException {
+    private Marca instantiateMarca(ResultSet rs) throws SQLException, CampoObrigatorioException{
         Marca obj = new Marca();
         obj.setCnpj(rs.getString("cnpj"));
         obj.setNome(rs.getString("nome"));
