@@ -27,7 +27,8 @@ CREATE TABLE perfume (
     preco DECIMAL(10,2),
     estoque int,
     cnpj_marca  VARCHAR(20),
-    FOREIGN KEY (cnpj_marca) REFERENCES marca(cnpj)
+    FOREIGN KEY (cnpj_marca) REFERENCES marca(cnpj) ON DELETE CASCADE
+
 );
 
 CREATE TABLE pedido (
@@ -36,8 +37,8 @@ CREATE TABLE pedido (
     comissao DECIMAL(10,2),
     cpfCliente VARCHAR(20),
     cpfRevendedor VARCHAR(20),
-    FOREIGN KEY (cpfCliente) REFERENCES cliente(cpf),
-    FOREIGN KEY (cpfRevendedor) REFERENCES revendedor(cpf)
+    FOREIGN KEY (cpfCliente) REFERENCES cliente(cpf) ON DELETE CASCADE,
+    FOREIGN KEY (cpfRevendedor) REFERENCES revendedor(cpf) ON DELETE CASCADE
 );
 
 CREATE TABLE inclui (

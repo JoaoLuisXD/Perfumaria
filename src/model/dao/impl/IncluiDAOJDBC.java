@@ -21,7 +21,7 @@ public class IncluiDAOJDBC implements IncluiDAO {
     public void insert(Inclui obj) {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "INSERT INTO inclui (id_pedido, id_perfume, qtd_itens, data) VALUES (?, ?, ?, ?)"
+                "INSERT INTO inclui (idPedido, idPerfume, qtd_itens, data) VALUES (?, ?, ?, ?)"
             );
 
             st.setInt(1, obj.getIdPedido());
@@ -41,7 +41,7 @@ public class IncluiDAOJDBC implements IncluiDAO {
     public void update(Inclui obj) {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "UPDATE inclui SET qtd_itens=?, data=? WHERE id_pedido=? AND id_perfume=?"
+                "UPDATE inclui SET qtd_itens=?, data=? WHERE idPedido=? AND idPerfume=?"
             );
 
             st.setInt(1, obj.getQtd_itens());
@@ -58,16 +58,16 @@ public class IncluiDAOJDBC implements IncluiDAO {
     }
 
     @Override
-    public void delete(int idPedido, int idPerfume) throws DBIntegrityException{
+    public void delete(int idPedido, int idPerfume) throws DBIntegrityException {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "DELETE FROM inclui WHERE id_pedido=? AND id_perfume=?"
+                "DELETE FROM inclui WHERE idPedido=? AND idPerfume=?"
             );
 
             st.setInt(1, idPedido);
             st.setInt(2, idPerfume);
-            st.executeUpdate();
 
+            st.executeUpdate();
             DB.closeStatement(st);
 
         } catch (SQLException e) {
@@ -79,7 +79,7 @@ public class IncluiDAOJDBC implements IncluiDAO {
     public Inclui findById(int idPedido, int idPerfume) {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "SELECT * FROM inclui WHERE id_pedido=? AND id_perfume=?"
+                "SELECT * FROM inclui WHERE idPedido=? AND idPerfume=?"
             );
 
             st.setInt(1, idPedido);
@@ -126,8 +126,8 @@ public class IncluiDAOJDBC implements IncluiDAO {
 
     private Inclui instantiateInclui(ResultSet rs) throws SQLException {
         Inclui obj = new Inclui();
-        obj.setIdPedido(rs.getInt("id_pedido"));
-        obj.setIdPerfume(rs.getInt("id_perfume"));
+        obj.setIdPedido(rs.getInt("idPedido"));
+        obj.setIdPerfume(rs.getInt("idPerfume"));
         obj.setQtd_itens(rs.getInt("qtd_itens"));
         obj.setData(rs.getDate("data"));
         return obj;

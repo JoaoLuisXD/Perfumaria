@@ -23,44 +23,43 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public void insert(Entrega obj) throws DBException, CampoObrigatorioException{
-    PreparedStatement st = null;
+    public void insert(Entrega obj) throws DBException, CampoObrigatorioException {
+        PreparedStatement st = null;
 
-    try {
-        st = conn.prepareStatement(
-            "INSERT INTO entrega (endereco, valor_entrega, data, status, idPedido, tipo) " +
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            Statement.RETURN_GENERATED_KEYS
-        );
+        try {
+            st = conn.prepareStatement(
+                "INSERT INTO entrega (endereco, valorEntrega, data, status, idPedido, tipo) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                Statement.RETURN_GENERATED_KEYS
+            );
 
-        st.setString(1, obj.getEndereco());
-        st.setDouble(2, obj.getValorEntrega());
-        st.setDate(3, new java.sql.Date(obj.getData().getTime()));
-        st.setString(4, obj.getStatus());
-        st.setInt(5, obj.getIdPedido());
-        st.setString(6, (obj instanceof EntregaRapida) ? "RAPIDA" : "NORMAL");
+            st.setString(1, obj.getEndereco());
+            st.setDouble(2, obj.getValorEntrega());
+            st.setDate(3, new java.sql.Date(obj.getData().getTime()));
+            st.setString(4, obj.getStatus());
+            st.setInt(5, obj.getIdPedido());
+            st.setString(6, (obj instanceof EntregaRapida) ? "RAPIDA" : "NORMAL");
 
-        st.executeUpdate();
+            st.executeUpdate();
 
-        ResultSet rs = st.getGeneratedKeys();
-        if (rs.next()) {
-            obj.setId(rs.getInt(1));
+            ResultSet rs = st.getGeneratedKeys();
+            if (rs.next()) {
+                obj.setId(rs.getInt(1));
+            }
+
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+
+        } catch (SQLException e) {
+            throw new DBException(e.getMessage());
         }
-
-        DB.closeStatement(st);
-        DB.closeResultSet(rs);
-
-    } catch (SQLException e) {
-        throw new DBException(e.getMessage());
     }
-}
-
 
     @Override
     public void update(Entrega obj) throws DBException {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "UPDATE entrega SET endereco=?, valor_entrega=?, data=?, status=? WHERE id=?"
+                "UPDATE entrega SET endereco=?, valorEntrega=?, data=?, status=? WHERE id=?"
             );
 
             st.setString(1, obj.getEndereco());
@@ -95,57 +94,62 @@ public class EntregaDAOJDBC implements EntregaDAO {
     }
 
     @Override
-    public Entrega findById(Integer id) throws DBException, EntidadeNaoEncontradaException, CampoObrigatorioException {
+    public Entrega findById(Integer id)
+            throws DBException, EntidadeNaoEncontradaException, CampoObrigatorioException {
+
         try {
-        PreparedStatement st = conn.prepareStatement("SELECT * FROM entrega WHERE id_entrega = ?");
-        st.setInt(1, id);
+            PreparedStatement st = conn.prepareStatement(
+                "SELECT * FROM entrega WHERE id = ?"
+            );
+            st.setInt(1, id);
 
-        ResultSet rs = st.executeQuery();
+            ResultSet rs = st.executeQuery();
 
-        if (!rs.next()) {
+            if (!rs.next()) {
+                DB.closeResultSet(rs);
+                DB.closeStatement(st);
+                throw new EntidadeNaoEncontradaException(
+                        "Entrega com id " + id + " não encontrada."
+                );
+            }
+
+            Entrega obj = instantiateEntrega(rs);
+
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            throw new EntidadeNaoEncontradaException("Entrega com id " + id + " não encontrado.");
-        }
-
-        Entrega obj = instantiateEntrega(rs);
-
-        DB.closeResultSet(rs);
-        DB.closeStatement(st);
-        return obj;
+            return obj;
 
         } catch (SQLException e) {
-            throw new DBException("Erro ao buscar cliente");
+            throw new DBException("Erro ao buscar entrega");
         }
     }
 
     @Override
-public Entrega findByPedidoId(int pedidoId) throws DBException{
-    PreparedStatement st = null;
-    ResultSet rs = null;
+    public Entrega findByPedidoId(int pedidoId) throws DBException {
+        PreparedStatement st = null;
+        ResultSet rs = null;
 
-    try {
-        st = conn.prepareStatement(
-            "SELECT * FROM entrega WHERE idPedido = ?"
-        );
+        try {
+            st = conn.prepareStatement(
+                "SELECT * FROM entrega WHERE idPedido = ?"
+            );
 
-        st.setInt(1, pedidoId);
-        rs = st.executeQuery();
+            st.setInt(1, pedidoId);
+            rs = st.executeQuery();
 
-        if (rs.next()) {
-            return instantiateEntrega(rs);
+            if (rs.next()) {
+                return instantiateEntrega(rs);
+            }
+
+            return null;
+
+        } catch (SQLException e) {
+            throw new DBException("Erro ao buscar entrega por pedido: " + e.getMessage());
+        } finally {
+            DB.closeResultSet(rs);
+            DB.closeStatement(st);
         }
-
-        return null;
-
-    } catch (SQLException e) {
-        throw new DBException("Erro ao buscar entrega por pedido: " + e.getMessage());
-    } finally {
-        DB.closeResultSet(rs);
-        DB.closeStatement(st);
     }
-}
-
 
     @Override
     public List<Entrega> findAll() throws DBException {
@@ -173,30 +177,29 @@ public Entrega findByPedidoId(int pedidoId) throws DBException{
 
     private Entrega instantiateEntrega(ResultSet rs) throws SQLException {
 
-    String tipo = rs.getString("tipo");
-    Entrega obj;
+        String tipo = rs.getString("tipo");
+        Entrega obj;
 
-    if (tipo.equalsIgnoreCase("RAPIDA")) {
-        obj = new EntregaRapida(
-            rs.getInt("id"),
-            rs.getString("endereco"),
-            rs.getDouble("valor_entrega"),
-            rs.getDate("data"),
-            rs.getString("status"),
-            rs.getInt("idPedido")
-        );
-    } else {
-        obj = new EntregaNormal(
-            rs.getInt("id"),
-            rs.getString("endereco"),
-            rs.getDouble("valor_entrega"),
-            rs.getDate("data"),
-            rs.getString("status"),
-            rs.getInt("idPedido")
-        );
+        if (tipo.equalsIgnoreCase("RAPIDA")) {
+            obj = new EntregaRapida(
+                rs.getInt("id"),
+                rs.getString("endereco"),
+                rs.getDouble("valorEntrega"),
+                rs.getDate("data"),
+                rs.getString("status"),
+                rs.getInt("idPedido")
+            );
+        } else {
+            obj = new EntregaNormal(
+                rs.getInt("id"),
+                rs.getString("endereco"),
+                rs.getDouble("valorEntrega"),
+                rs.getDate("data"),
+                rs.getString("status"),
+                rs.getInt("idPedido")
+            );
+        }
+
+        return obj;
     }
-
-    return obj;
-}
-
 }
