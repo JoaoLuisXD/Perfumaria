@@ -25,7 +25,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
     public void insert(Marca obj) throws EntidadeJaExisteException, DBException {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "INSERT INTO marca (cnpj, nome, origem, ano_criacao) VALUES (?, ?, ?, ?)"
+                "INSERT INTO marca (cnpj, nome, origem, anoCriacao) VALUES (?, ?, ?, ?)"
             );
 
             st.setString(1, obj.getCnpj());
@@ -39,7 +39,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
             if (e.getErrorCode() == 1062) {
                 throw new EntidadeJaExisteException("CNPJ já cadastrado.");
             }
-            throw new DBException(e.getMessage()); 
+            throw new DBException(e.getMessage());
         }
     }
 
@@ -47,7 +47,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
     public void update(Marca obj) {
         try {
             PreparedStatement st = conn.prepareStatement(
-                "UPDATE marca SET nome=?, origem=?, ano_criacao=? WHERE cnpj=?"
+                "UPDATE marca SET nome=?, origem=?, anoCriacao=? WHERE cnpj=?"
             );
 
             st.setString(1, obj.getNome());
@@ -63,7 +63,7 @@ public class MarcaDAOJDBC implements MarcaDAO {
     }
 
     @Override
-    public void deleteByCnpj(String cnpj) throws DBIntegrityException{
+    public void deleteByCnpj(String cnpj) throws DBIntegrityException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "DELETE FROM marca WHERE cnpj=?"
@@ -80,36 +80,35 @@ public class MarcaDAOJDBC implements MarcaDAO {
 
     @Override
     public Marca findByCnpj(String cnpj) throws EntidadeNaoEncontradaException, DBException, CampoObrigatorioException {
-    try {
-        PreparedStatement st = conn.prepareStatement(
-            "SELECT * FROM marca WHERE cnpj = ?"
-        );
-        st.setString(1, cnpj);
+        try {
+            PreparedStatement st = conn.prepareStatement(
+                "SELECT * FROM marca WHERE cnpj = ?"
+            );
+            st.setString(1, cnpj);
 
-        ResultSet rs = st.executeQuery();
+            ResultSet rs = st.executeQuery();
 
-        // Se não encontrou nenhum registro no banco
-        if (!rs.next()) {
+            if (!rs.next()) {
+                DB.closeResultSet(rs);
+                DB.closeStatement(st);
+                throw new EntidadeNaoEncontradaException(
+                    "Marca com CNPJ " + cnpj + " não encontrada."
+                );
+            }
+
+            Marca obj = instantiateMarca(rs);
+
             DB.closeResultSet(rs);
             DB.closeStatement(st);
-            throw new EntidadeNaoEncontradaException("Marca com CNPJ " + cnpj + " não encontrada.");
+            return obj;
+
+        } catch (SQLException e) {
+            throw new DBException("Erro ao buscar marca");
         }
-
-        // Se encontrou, instancia normalmente
-        Marca obj = instantiateMarca(rs);
-
-        DB.closeResultSet(rs);
-        DB.closeStatement(st);
-        return obj;
-
-    } catch (SQLException e) {
-        throw new DBException("Erro ao buscar marca");
     }
-}
-
 
     @Override
-    public List<Marca> findAll() throws CampoObrigatorioException{
+    public List<Marca> findAll() throws CampoObrigatorioException {
         try {
             PreparedStatement st = conn.prepareStatement(
                 "SELECT * FROM marca"
@@ -131,12 +130,12 @@ public class MarcaDAOJDBC implements MarcaDAO {
         }
     }
 
-    private Marca instantiateMarca(ResultSet rs) throws SQLException, CampoObrigatorioException{
+    private Marca instantiateMarca(ResultSet rs) throws SQLException, CampoObrigatorioException {
         Marca obj = new Marca();
         obj.setCnpj(rs.getString("cnpj"));
         obj.setNome(rs.getString("nome"));
         obj.setOrigem(rs.getString("origem"));
-        obj.setAnoCriacao(rs.getInt("ano_criacao"));
+        obj.setAnoCriacao(rs.getInt("anoCriacao"));
         return obj;
     }
 }

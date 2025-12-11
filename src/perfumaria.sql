@@ -18,13 +18,14 @@ CREATE TABLE revendedor (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100),
     salario DECIMAL(10,2),
-    telefone ARCHAR(20)
+    telefone VARCHAR(20)
 );
 
 CREATE TABLE perfume (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     preco DECIMAL(10,2),
+    estoque int,
     cnpj_marca  VARCHAR(20),
     FOREIGN KEY (cnpj_marca) REFERENCES marca(cnpj)
 );
@@ -55,8 +56,7 @@ CREATE TABLE entrega (
     valorEntrega DECIMAL(10,2) NOT NULL,
     data DATE,
     status VARCHAR(20),
-    tipo VARCHAR(20) NOT NULL
-    idPedido  INT
-    FOREIGN KEY (idPerfume) REFERENCES perfume(id)
+    tipo VARCHAR(20) NOT NULL, 
+    idPedido INT,
+    FOREIGN KEY (idPedido) REFERENCES pedido(id)
 );
-
